@@ -15,26 +15,54 @@
 <body>
     <h2>Admin Panel</h2>
     
-    <h3>Add a New Place</h3>
-    <input type="text" id="placeName" placeholder="Place Name">
-    <input type="text" id="placeLocation" placeholder="Location">
-    <button onclick="addPlace()">Add Place</button>
+    <h3>Login</h3>
+    <input type="email" id="adminEmail" placeholder="Email">
+    <input type="password" id="adminPassword" placeholder="Password">
+    <button onclick="adminLogin()">Login</button>
     
-    <h3>Users List</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="usersTable">
-        </tbody>
-    </table>
+    <div id="adminContent" style="display:none;">
+        <h3>Add a New Place</h3>
+        <input type="text" id="placeName" placeholder="Place Name">
+        <input type="text" id="placeLocation" placeholder="Location">
+        <button onclick="addPlace()">Add Place</button>
+        
+        <h3>Users List</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+            </tbody>
+        </table>
+    </div>
     
     <script>
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                alert('Login successful!');
+                document.getElementById('adminContent').style.display = 'block';
+                loadUsers();
+            } else {
+                alert('Login failed');
+            }
+        }
+        
         async function addPlace() {
             const name = document.getElementById('placeName').value;
             const location = document.getElementById('placeLocation').value;
@@ -97,8 +125,6 @@
                 alert('Failed to promote user');
             }
         }
-        
-        loadUsers();
     </script>
 </body>
 </html>
