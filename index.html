@@ -5,93 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        input, button { margin: 10px 0; padding: 8px; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        input, button { margin: 10px 0; padding: 10px; width: 100%; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .nav { display: flex; justify-content: space-between; padding: 10px; background: #007bff; color: white; }
+        .nav a { color: white; text-decoration: none; margin-right: 10px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <h2>Admin Panel</h2>
-    
-    <h3>Login</h3>
-    <input type="email" id="adminEmail" placeholder="Email">
-    <input type="password" id="adminPassword" placeholder="Password">
-    <button onclick="adminLogin()">Login</button>
-    
-    <div id="adminContent" style="display:none;">
-        <h3>Add a New Place</h3>
-        <input type="text" id="placeName" placeholder="Place Name">
-        <input type="text" id="placeLocation" placeholder="Location">
-        <button onclick="addPlace()">Add Place</button>
-        
-        <h3>Users List</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="usersTable">
-            </tbody>
-        </table>
+    <div class="nav">
+        <div>
+            <a href="#" onclick="showPage('login')">Login</a>
+            <a href="#" onclick="showPage('users')">Users</a>
+            <a href="#" onclick="showPage('places')">Places</a>
+            <a href="#" onclick="showPage('add-place')">Add Place</a>
+        </div>
+        <button onclick="logout()">Logout</button>
     </div>
-    
+
+    <div class="container">
+        <div id="login" class="page">
+            <h2>Admin Login</h2>
+            <input type="email" id="adminEmail" placeholder="Email">
+            <input type="password" id="adminPassword" placeholder="Password">
+            <button onclick="adminLogin()">Login</button>
+        </div>
+
+        <div id="users" class="page hidden">
+            <h2>Users List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTable"></tbody>
+            </table>
+        </div>
+
+        <div id="places" class="page hidden">
+            <h2>Places List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="placesTable"></tbody>
+            </table>
+        </div>
+
+        <div id="add-place" class="page hidden">
+            <h2>Add a New Place</h2>
+            <input type="text" id="placeName" placeholder="Place Name">
+            <input type="text" id="placeLocation" placeholder="Location">
+            <button onclick="addPlace()">Add Place</button>
+        </div>
+    </div>
+
     <script>
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(page).classList.remove('hidden');
+        }
+
         async function adminLogin() {
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
-            
             const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem('token', data.token);
                 alert('Login successful!');
-                document.getElementById('adminContent').style.display = 'block';
+                showPage('users');
                 loadUsers();
+                loadPlaces();
             } else {
                 alert('Login failed');
             }
         }
-        
-        async function addPlace() {
-            const name = document.getElementById('placeName').value;
-            const location = document.getElementById('placeLocation').value;
-            const token = localStorage.getItem('token');
-            
-            const response = await fetch('/api/places', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ name, location })
-            });
-            
-            if (response.ok) {
-                alert('Place added successfully!');
-                location.reload();
-            } else {
-                alert('Failed to add place');
-            }
+
+        function logout() {
+            localStorage.removeItem('token');
+            alert('Logged out');
+            showPage('login');
         }
-        
+
         async function loadUsers() {
             const token = localStorage.getItem('token');
             const response = await fetch('/api/users', {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
             if (response.ok) {
                 const users = await response.json();
                 const table = document.getElementById('usersTable');
@@ -101,28 +120,61 @@
                         <td>${user.id}</td>
                         <td>${user.email}</td>
                         <td>${user.role}</td>
-                        <td><button onclick="makeAdmin('${user.email}')">Make Admin</button></td>
+                        <td>
+                            <button onclick="makeAdmin('${user.email}')">Make Admin</button>
+                            <button onclick="deleteUser('${user.id}')">Delete</button>
+                        </td>
                     </tr>`;
                 });
             }
         }
-        
-        async function makeAdmin(email) {
+
+        async function deleteUser(userId) {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/make-admin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ email })
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-            
             if (response.ok) {
-                alert('User promoted to admin!');
+                alert('User deleted');
                 loadUsers();
             } else {
-                alert('Failed to promote user');
+                alert('Failed to delete user');
+            }
+        }
+
+        async function loadPlaces() {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/places', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const places = await response.json();
+                const table = document.getElementById('placesTable');
+                table.innerHTML = '';
+                places.forEach(place => {
+                    table.innerHTML += `<tr>
+                        <td>${place.id}</td>
+                        <td>${place.name}</td>
+                        <td>${place.location}</td>
+                        <td><button onclick="deletePlace('${place.id}')">Delete</button></td>
+                    </tr>`;
+                });
+            }
+        }
+
+        async function deletePlace(placeId) {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/places/${placeId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                alert('Place deleted');
+                loadPlaces();
+            } else {
+                alert('Failed to delete place');
             }
         }
     </script>
