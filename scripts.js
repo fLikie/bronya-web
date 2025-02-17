@@ -33,9 +33,9 @@ async function loadUsers() {
         table.innerHTML = '';
         users.forEach(user => {
             table.innerHTML += `<tr>
-                <td>${user.id}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
+                <td>${user.ID}</td>
+                <td>${user.Email}</td>
+                <td>${user.Role}</td>
                 <td><button onclick="deleteUser('${user.id}')">Delete</button></td>
             </tr>`;
         });
