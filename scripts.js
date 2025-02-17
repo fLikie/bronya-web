@@ -54,9 +54,9 @@ async function loadPlaces() {
         table.innerHTML = '';
         places.forEach(place => {
             table.innerHTML += `<tr>
-                <td>${place.id}</td>
-                <td>${place.name}</td>
-                <td>${place.location}</td>
+                <td>${place.ID}</td>
+                <td>${place.Name}</td>
+                <td>${place.Location}</td>
                 <td><button onclick="deletePlace('${place.id}')">Delete</button></td>
             </tr>`;
         });
