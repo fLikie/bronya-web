@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Places</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="nav">
+        <a href="users.html">Users</a>
+        <a href="places.html">Places</a>
+        <a href="add-place.html">Add Place</a>
+        <button onclick="logout()">Logout</button>
+    </div>
+    <div class="container">
+        <h2>Places List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="placesTable"></tbody>
+        </table>
+    </div>
+    <script src="scripts.js"></script>
+    <script>loadPlaces();</script>
+</body>
+</html>
