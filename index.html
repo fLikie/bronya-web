@@ -46,7 +46,7 @@
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
             
-            const response = await fetch('/login', {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -68,7 +68,7 @@
             const location = document.getElementById('placeLocation').value;
             const token = localStorage.getItem('token');
             
-            const response = await fetch('/places', {
+            const response = await fetch('/api/places', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,7 +87,7 @@
         
         async function loadUsers() {
             const token = localStorage.getItem('token');
-            const response = await fetch('/users', {
+            const response = await fetch('/api/users', {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -109,7 +109,7 @@
         
         async function makeAdmin(email) {
             const token = localStorage.getItem('token');
-            const response = await fetch('/make-admin', {
+            const response = await fetch('/api/make-admin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
