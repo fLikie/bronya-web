@@ -17,6 +17,8 @@
         <h2>Add a New Place</h2>
         <input type="text" id="placeName" placeholder="Place Name">
         <input type="text" id="placeLocation" placeholder="Location">
+        <input type="file" id="placeImage" accept="image/*" onchange="previewImage(event)">
+        <img id="imagePreview" style="max-width: 200px; display: none;">
         <button onclick="addPlace()">Add Place</button>
     </div>
     <script src="scripts.js"></script>

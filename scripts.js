@@ -94,29 +94,26 @@ async function updatePlace() {
     }
 }
 
-async function loadPlace() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const placeId = urlParams.get('id'); // Получаем ID из URL
-    if (!placeId) {
-        alert("Invalid place ID");
-        window.location.href = "places.html";
-        return;
-    }
-
+async function loadPlaces() {
     const token = localStorage.getItem('token');
-    const response = await fetch(`/api/places/${placeId}`, {
+    const response = await fetch('/api/places', {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
     });
 
     if (response.ok) {
-        const place = await response.json();
-        document.getElementById('placeId').value = place.ID; // Присваиваем ID
-        document.getElementById('placeName').value = place.Name;
-        document.getElementById('placeLocation').value = place.Location;
-    } else {
-        alert("Failed to load place");
-        window.location.href = "places.html";
+        const places = await response.json();
+        const table = document.getElementById('placesTable');
+        table.innerHTML = '';
+        places.forEach(place => {
+            table.innerHTML += `<tr>
+                <td>${place.ID}</td>
+                <td><img src="/uploads/${place.Image}" style="max-width: 100px;"></td>
+                <td><a href="place.html?id=${place.ID}">${place.Name}</a></td>
+                <td>${place.Location}</td>
+                <td><button onclick="deletePlace('${place.ID}')">Delete</button></td>
+            </tr>`;
+        });
     }
 }
 
@@ -140,13 +137,31 @@ async function deletePlace(placeId) {
 async function addPlace() {
     const name = document.getElementById('placeName').value;
     const location = document.getElementById('placeLocation').value;
+    const imageInput = document.getElementById('placeImage');
+    
+    if (!name || !location || !imageInput.files.length) {
+        alert("Please fill all fields and select an image.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("location", location);
+    formData.append("image", imageInput.files[0]);
+
     const token = localStorage.getItem('token');
-    await fetch('/api/places', {
+    const response = await fetch('/api/places', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ name, location })
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
     });
-    window.location.href = 'places.html';
+
+    if (response.ok) {
+        alert("Place added successfully!");
+        window.location.href = "places.html";
+    } else {
+        alert("Failed to add place");
+    }
 }
 
 document.addEventListener("DOMContentLoaded", loadPlaces);
