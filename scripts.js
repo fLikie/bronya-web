@@ -70,26 +70,32 @@ async function updatePlace() {
     }
 }
 
-async function loadPlaces() {
+async function loadPlace() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const placeId = urlParams.get('id');
+    if (!placeId) {
+        alert("Invalid place ID");
+        window.location.href = "places.html";
+        return;
+    }
+
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/places', {
+    const response = await fetch(`/api/places/${placeId}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
     });
 
     if (response.ok) {
-        const places = await response.json();
-        const table = document.getElementById('placesTable');
-        table.innerHTML = '';
-        places.forEach(place => {
-            table.innerHTML += `<tr>
-                <td>${place.ID}</td>
-                <td><img src="/uploads/${place.image}" style="max-width: 100px;"></td>
-                <td><a href="place.html?id=${place.ID}">${place.Name}</a></td>
-                <td>${place.Location}</td>
-                <td><button onclick="deletePlace('${place.ID}')">Delete</button></td>
-            </tr>`;
-        });
+        const place = await response.json();
+        document.getElementById('placeId').value = place.ID;
+        document.getElementById('placeName').value = place.Name;
+        document.getElementById('placeLocation').value = place.Location;
+        const currentImage = document.getElementById('currentImage');
+        currentImage.src = `/uploads/${place.Image}`;
+        currentImage.style.display = 'block';
+    } else {
+        alert("Failed to load place");
+        window.location.href = "places.html";
     }
 }
 
