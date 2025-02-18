@@ -43,23 +43,23 @@ async function loadUsers() {
 }
 
 async function updatePlace() {
-    const placeId = document.getElementById('placeId').value; // Получаем ID
-    if (!placeId) {
-        alert("Invalid place ID");
-        return;
-    }
-
+    const placeId = document.getElementById('placeId').value;
     const name = document.getElementById('placeName').value;
     const location = document.getElementById('placeLocation').value;
+    const imageInput = document.getElementById('placeImage');
+    
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("location", location);
+    if (imageInput.files.length > 0) {
+        formData.append("image", imageInput.files[0]);
+    }
 
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/places/${placeId}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ name, location }) // Убираем ID из тела запроса
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
     });
 
     if (response.ok) {

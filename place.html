@@ -18,9 +18,16 @@
         <input type="hidden" id="placeId">
         <input type="text" id="placeName" placeholder="Place Name">
         <input type="text" id="placeLocation" placeholder="Location">
+        <br>
+        <label>Current Image:</label>
+        <img id="currentImage" style="max-width: 200px; display: none;">
+        <br>
+        <label>Upload New Image:</label>
+        <input type="file" id="placeImage" accept="image/*" onchange="previewImage(event)">
+        <img id="imagePreview" style="max-width: 200px; display: none;">
+        <br>
         <button onclick="updatePlace()">Save Changes</button>
     </div>
     <script src="scripts.js"></script>
-    <script>loadPlace();</script>
 </body>
 </html>
