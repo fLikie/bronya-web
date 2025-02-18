@@ -65,7 +65,12 @@ async function loadPlaces() {
 }
 
 async function updatePlace() {
-    const placeId = document.getElementById('placeId').value;
+    const placeId = document.getElementById('placeId').value; // Получаем ID
+    if (!placeId) {
+        alert("Invalid place ID");
+        return;
+    }
+
     const name = document.getElementById('placeName').value;
     const location = document.getElementById('placeLocation').value;
 
@@ -76,7 +81,7 @@ async function updatePlace() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name, location })
+        body: JSON.stringify({ name, location }) // Убираем ID из тела запроса
     });
 
     if (response.ok) {
@@ -87,6 +92,31 @@ async function updatePlace() {
     }
 }
 
+async function loadPlace() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const placeId = urlParams.get('id'); // Получаем ID из URL
+    if (!placeId) {
+        alert("Invalid place ID");
+        window.location.href = "places.html";
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/places/${placeId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.ok) {
+        const place = await response.json();
+        document.getElementById('placeId').value = place.ID; // Присваиваем ID
+        document.getElementById('placeName').value = place.Name;
+        document.getElementById('placeLocation').value = place.Location;
+    } else {
+        alert("Failed to load place");
+        window.location.href = "places.html";
+    }
+}
 
 async function addPlace() {
     const name = document.getElementById('placeName').value;
