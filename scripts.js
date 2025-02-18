@@ -58,7 +58,9 @@ async function loadPlaces() {
                 <td>${place.ID}</td>
                 <td><a href="place.html?id=${place.ID}">${place.Name}</a></td>
                 <td>${place.Location}</td>
-                <td><button onclick="deletePlace('${place.ID}')">Delete</button></td>
+                <td>
+                    <button onclick="deletePlace('${place.ID}')">Delete</button>
+                </td>
             </tr>`;
         });
     }
@@ -118,6 +120,23 @@ async function loadPlace() {
     }
 }
 
+async function deletePlace(placeId) {
+    if (!confirm("Are you sure you want to delete this place?")) return;
+    
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/places/${placeId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.ok) {
+        alert("Place deleted successfully!");
+        loadPlaces();
+    } else {
+        alert("Failed to delete place");
+    }
+}
+
 async function addPlace() {
     const name = document.getElementById('placeName').value;
     const location = document.getElementById('placeLocation').value;
@@ -129,3 +148,5 @@ async function addPlace() {
     });
     window.location.href = 'places.html';
 }
+
+document.addEventListener("DOMContentLoaded", loadPlaces);
