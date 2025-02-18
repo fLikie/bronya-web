@@ -42,30 +42,6 @@ async function loadUsers() {
     }
 }
 
-async function loadPlaces() {
-    const token = localStorage.getItem('token');
-    const response = await fetch('/api/places', {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (response.ok) {
-        const places = await response.json();
-        const table = document.getElementById('placesTable');
-        table.innerHTML = '';
-        places.forEach(place => {
-            table.innerHTML += `<tr>
-                <td>${place.ID}</td>
-                <td><a href="place.html?id=${place.ID}">${place.Name}</a></td>
-                <td>${place.Location}</td>
-                <td>
-                    <button onclick="deletePlace('${place.ID}')">Delete</button>
-                </td>
-            </tr>`;
-        });
-    }
-}
-
 async function updatePlace() {
     const placeId = document.getElementById('placeId').value; // Получаем ID
     if (!placeId) {
@@ -108,7 +84,7 @@ async function loadPlaces() {
         places.forEach(place => {
             table.innerHTML += `<tr>
                 <td>${place.ID}</td>
-                <td><img src="/uploads/${place.Image}" style="max-width: 100px;"></td>
+                <td><img src="/uploads/${place.image}" style="max-width: 100px;"></td>
                 <td><a href="place.html?id=${place.ID}">${place.Name}</a></td>
                 <td>${place.Location}</td>
                 <td><button onclick="deletePlace('${place.ID}')">Delete</button></td>
