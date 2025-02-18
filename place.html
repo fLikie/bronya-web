@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Place</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="nav">
+        <a href="users.html">Users</a>
+        <a href="places.html">Places</a>
+        <a href="add-place.html">Add Place</a>
+        <button onclick="logout()">Logout</button>
+    </div>
+    <div class="container">
+        <h2>Edit Place</h2>
+        <input type="hidden" id="placeId">
+        <input type="text" id="placeName" placeholder="Place Name">
+        <input type="text" id="placeLocation" placeholder="Location">
+        <button onclick="updatePlace()">Save Changes</button>
+    </div>
+    <script src="scripts.js"></script>
+    <script>loadPlace();</script>
+</body>
+</html>

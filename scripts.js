@@ -48,6 +48,7 @@ async function loadPlaces() {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
     });
+
     if (response.ok) {
         const places = await response.json();
         const table = document.getElementById('placesTable');
@@ -55,13 +56,37 @@ async function loadPlaces() {
         places.forEach(place => {
             table.innerHTML += `<tr>
                 <td>${place.ID}</td>
-                <td>${place.Name}</td>
+                <td><a href="place.html?id=${place.ID}">${place.Name}</a></td>
                 <td>${place.Location}</td>
-                <td><button onclick="deletePlace('${place.id}')">Delete</button></td>
+                <td><button onclick="deletePlace('${place.ID}')">Delete</button></td>
             </tr>`;
         });
     }
 }
+
+async function updatePlace() {
+    const placeId = document.getElementById('placeId').value;
+    const name = document.getElementById('placeName').value;
+    const location = document.getElementById('placeLocation').value;
+
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/places/${placeId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, location })
+    });
+
+    if (response.ok) {
+        alert("Place updated successfully!");
+        window.location.href = "places.html";
+    } else {
+        alert("Failed to update place");
+    }
+}
+
 
 async function addPlace() {
     const name = document.getElementById('placeName').value;
