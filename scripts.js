@@ -179,4 +179,55 @@ async function loadPlaces() {
     }
 }
 
+function showAddUserForm() {
+    document.getElementById('addUserForm').style.display = 'block';
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function validatePassword(password) {
+    return password.length >= 6;
+}
+
+async function addUser() {
+    const email = document.getElementById('newUserEmail').value;
+    const password = document.getElementById('newUserPassword').value;
+    const role = document.getElementById('newUserRole').value;
+    
+    if (!email || !password) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    if (!validateEmail(email)) {
+        alert("Invalid email format");
+        return;
+    }
+
+    if (!validatePassword(password)) {
+        alert("Password must be at least 6 characters long");
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ email, password, role })
+    });
+
+    if (response.ok) {
+        alert("User added successfully!");
+        window.location.reload();
+    } else {
+        alert("Failed to add user");
+    }
+}
+
 document.addEventListener("DOMContentLoaded", loadPlaces);
