@@ -1,8 +1,8 @@
 async function adminLogin() {
-    const phone = document.getElementById('phoneNumber').value.replace(/\D/g, "");
+    const phone = document.getElementById('phoneNumber').value.replace(/\D/g, "").slice(-10); // Оставляем только 10 цифр номера
     const password = document.getElementById('password').value;
     
-    if (!/^7\d{10}$/.test(phone)) {
+    if (!/^7\d{10}$/.test("7" + phone)) {
         alert("Invalid phone number format. Use +7 (xxx) xxx-xx-xx");
         return;
     }
@@ -15,7 +15,7 @@ async function adminLogin() {
     const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password })
+        body: JSON.stringify({ phone: "7" + phone, password }) // Отправляем номер без лишних символов
     });
 
     if (response.ok) {
@@ -245,18 +245,26 @@ async function addUser() {
 
 function formatPhoneNumber(event) {
     let input = event.target.value.replace(/\D/g, ""); // Удаляем все нецифровые символы
+
     if (input.startsWith("7")) {
-        input = "+7" + input.substring(1);
-    } else {
-        input = "+7" + input;
+        input = input.slice(1); // Убираем первую 7 (она добавится ниже)
     }
 
-    let formatted = input.replace(/(\+7)(\d{3})(\d{3})(\d{2})(\d{2})/, "$1 ($2) $3-$4-$5");
+    // Ограничиваем количество цифр
+    input = input.slice(0, 10);
+
+    // Применяем маску +7 (XXX) XXX-XX-XX
+    let formatted = "+7";
+    if (input.length > 0) formatted += " (" + input.slice(0, 3);
+    if (input.length >= 4) formatted += ") " + input.slice(3, 6);
+    if (input.length >= 7) formatted += "-" + input.slice(6, 8);
+    if (input.length >= 9) formatted += "-" + input.slice(8, 10);
+
     event.target.value = formatted;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    if (window.location.pathname.includes("index.html")) {
+    if (window.location.pathname.includes("login.html")) {
         const phoneInput = document.getElementById("phoneNumber");
         if (phoneInput) {
             phoneInput.addEventListener("input", formatPhoneNumber);
