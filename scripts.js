@@ -213,7 +213,7 @@ async function addUser() {
     }
 
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/users', {
+    const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
