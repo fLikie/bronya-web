@@ -15,7 +15,7 @@
     </div>
     <div class="container">
         <h2>Users List</h2>
-        <button onclick="showAddUserForm()">Add User</button>
+        <button id="showAddUserFormBtn">Add User</button>
         <div id="addUserForm" style="display: none; margin-top: 20px;">
             <h3>Add New User</h3>
             <input type="email" id="newUserEmail" placeholder="Email">
@@ -24,7 +24,7 @@
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
             </select>
-            <button onclick="addUser()">Create User</button>
+            <button id="addUserBtn">Create User</button>
         </div>
         <table>
             <thead>

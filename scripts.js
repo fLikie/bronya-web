@@ -230,4 +230,20 @@ async function addUser() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", loadPlaces);
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.getElementById("placesTable")) {
+        loadPlaces(); // Запуск только на places.html
+    }
+
+    if (document.getElementById("usersTable")) {
+        loadUsers(); // Загружаем пользователей только на users.html
+    }
+
+    if (document.getElementById("showAddUserFormBtn")) {
+        document.getElementById("showAddUserFormBtn").addEventListener("click", showAddUserForm);
+    }
+
+    if (document.getElementById("addUserBtn")) {
+        document.getElementById("addUserBtn").addEventListener("click", addUser);
+    }
+});
