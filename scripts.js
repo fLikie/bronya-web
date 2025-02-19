@@ -1,17 +1,30 @@
 async function adminLogin() {
-    const email = document.getElementById('adminEmail').value;
-    const password = document.getElementById('adminPassword').value;
+    const phone = document.getElementById('phoneNumber').value.replace(/\D/g, "");
+    const password = document.getElementById('password').value;
+    
+    if (!/^7\d{10}$/.test(phone)) {
+        alert("Invalid phone number format. Use +7 (xxx) xxx-xx-xx");
+        return;
+    }
+    
+    if (!password) {
+        alert("Please enter a password");
+        return;
+    }
+
     const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ phone, password })
     });
+
     if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('token', data.token);
-        window.location.href = 'users.html';
+        localStorage.setItem("token", data.token);
+        alert("Login successful!");
+        window.location.href = "users.html";
     } else {
-        alert('Login failed');
+        alert("Login failed. Check phone number and password.");
     }
 }
 
@@ -230,7 +243,31 @@ async function addUser() {
     }
 }
 
+function formatPhoneNumber(event) {
+    let input = event.target.value.replace(/\D/g, ""); // Удаляем все нецифровые символы
+    if (input.startsWith("7")) {
+        input = "+7" + input.substring(1);
+    } else {
+        input = "+7" + input;
+    }
+
+    let formatted = input.replace(/(\+7)(\d{3})(\d{3})(\d{2})(\d{2})/, "$1 ($2) $3-$4-$5");
+    event.target.value = formatted;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
+    if (window.location.pathname.includes("index.html")) {
+        const phoneInput = document.getElementById("phoneNumber");
+        if (phoneInput) {
+            phoneInput.addEventListener("input", formatPhoneNumber);
+        }
+
+        const loginButton = document.querySelector("button");
+        if (loginButton) {
+            loginButton.addEventListener("click", login);
+        }
+    }
+
     if (document.getElementById("placesTable")) {
         loadPlaces(); // Запуск только на places.html
     }
