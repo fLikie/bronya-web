@@ -35,6 +35,27 @@
     </div>
     <script src="scripts.js"></script>
     <script>
+                async function loadBookingsPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const placeId = urlParams.get('id');
+            if (!placeId) {
+                alert("Invalid place ID");
+                window.location.href = "places.html";
+                return;
+            }
+
+            const response = await fetch(`/api/places/${placeId}`);
+            if (response.ok) {
+                const place = await response.json();
+                document.getElementById('placeTitle').textContent = `Bookings for ${place.Name}`;
+                document.getElementById('placeLocation').textContent = place.Location;
+                loadBookings(placeId);
+            } else {
+                alert("Failed to load place");
+                window.location.href = "places.html";
+            }
+        }
+
         async function loadBookings(placeId) {
             const response = await fetch(`/api/places/${placeId}/bookings`);
             if (response.ok) {
@@ -45,6 +66,7 @@
                     table.innerHTML += `<tr>
                         <td>${booking.time_slot}</td>
                         <td>${booking.user_id}</td>
+                        <td><button onclick="deleteBooking(${booking.id}, ${placeId})">Delete</button></td>
                     </tr>`;
                 });
             }
@@ -77,8 +99,24 @@
             }
         }
 
-        loadPlace();
-        loadBookings();
+        async function deleteBooking(bookingId, placeId) {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/bookings/${bookingId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert("Booking deleted!");
+                loadBookings(placeId);
+            } else {
+                alert("Failed to delete booking");
+            }
+        }
+
+        loadBookingsPage();
     </script>
 </body>
 </html>
