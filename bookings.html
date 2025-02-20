@@ -22,8 +22,10 @@
         <table>
             <thead>
                 <tr>
+                    <th>Date</th>
                     <th>Time Slot</th>
                     <th>User ID</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="bookingsTable"></tbody>
@@ -97,15 +99,12 @@ async function loadBookings(placeId) {
         table.innerHTML = '';
         bookings.forEach(booking => {
             table.innerHTML += `<tr>
+                <td>${booking.date}</td>
                 <td>${booking.time_slot}</td>
                 <td>${booking.user_id}</td>
                 <td><button onclick="deleteBooking(${booking.id}, ${placeId})">Delete</button></td>
             </tr>`;
         });
-    } else if (response.status === 401) {
-        alert("Session expired. Please log in again.");
-        localStorage.removeItem('token');
-        window.location.href = "login.html";
     } else {
         alert("Failed to load bookings");
         console.error("Error fetching bookings:", response.status, await response.text());
