@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Place Details</title>
+    <title>Edit Place</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,92 +14,21 @@
         <button onclick="logout()">Logout</button>
     </div>
     <div class="container">
-        <h2 id="placeTitle">Place Details</h2>
-        <p><strong>Location:</strong> <span id="placeLocation"></span></p>
-        <img id="placeImage" style="max-width: 200px;">
-        
-        <h3>Bookings</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Time Slot</th>
-                    <th>User ID</th>
-                </tr>
-            </thead>
-            <tbody id="bookingsTable"></tbody>
-        </table>
-        
-        <h3>Add Booking</h3>
-        <input type="time" id="timeSlot" required>
-        <button onclick="addBooking()">Book</button>
+        <h2>Edit Place</h2>
+        <input type="hidden" id="placeId">
+        <input type="text" id="placeName" placeholder="Place Name">
+        <input type="text" id="placeLocation" placeholder="Location">
+        <br>
+        <label>Current Image:</label>
+        <img id="currentImage" style="max-width: 200px; display: none;">
+        <br>
+        <label>Upload New Image:</label>
+        <input type="file" id="placeImage" accept="image/*" onchange="previewImage(event)">
+        <img id="imagePreview" style="max-width: 200px; display: none;">
+        <br>
+        <button onclick="updatePlace()">Save Changes</button>
     </div>
     <script src="scripts.js"></script>
-    <script>
-        async function loadPlace() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const placeId = urlParams.get('id');
-            if (!placeId) {
-                alert("Invalid place ID");
-                window.location.href = "places.html";
-                return;
-            }
-
-            const response = await fetch(`/api/places/${placeId}`);
-            if (response.ok) {
-                const place = await response.json();
-                document.getElementById('placeTitle').textContent = place.Name;
-                document.getElementById('placeLocation').textContent = place.Location;
-                document.getElementById('placeImage').src = `/uploads/${place.Image}`;
-                loadBookings(placeId);
-            } else {
-                alert("Failed to load place");
-                window.location.href = "places.html";
-            }
-        }
-
-        async function loadBookings(placeId) {
-            const response = await fetch(`/api/places/${placeId}/bookings`);
-            if (response.ok) {
-                const bookings = await response.json();
-                const table = document.getElementById('bookingsTable');
-                table.innerHTML = '';
-                bookings.forEach(booking => {
-                    table.innerHTML += `<tr>
-                        <td>${booking.time_slot}</td>
-                        <td>${booking.user_id}</td>
-                    </tr>`;
-                });
-            }
-        }
-
-        async function addBooking() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const placeId = urlParams.get('id');
-            const timeSlot = document.getElementById('timeSlot').value;
-            if (!timeSlot) {
-                alert("Please select a time");
-                return;
-            }
-
-            const token = localStorage.getItem('token');
-            const response = await fetch('/api/bookings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ place_id: placeId, time_slot: timeSlot })
-            });
-
-            if (response.ok) {
-                alert("Booking added successfully!");
-                loadBookings(placeId);
-            } else {
-                alert("Failed to add booking");
-            }
-        }
-
-        loadPlace();
-    </script>
+    <script>loadPlace();</script>
 </body>
 </html>
