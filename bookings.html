@@ -30,6 +30,9 @@
         </table>
         
         <h3>Add Booking</h3>
+        <label>Select Date:</label>
+        <input type="date" id="datePicker" required>
+        <label>Select Time:</label>
         <input type="time" id="timeSlot" required>
         <button onclick="addBooking()">Book</button>
     </div>
@@ -109,32 +112,46 @@ async function loadBookings(placeId) {
     }
 }
 
-        async function addBooking() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const placeId = Number(urlParams.get('id'));
-            const timeSlot = document.getElementById('timeSlot').value;
-            if (!timeSlot) {
-                alert("Please select a time");
-                return;
-            }
+async function addBooking() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const placeId = Number(urlParams.get('id')); // Преобразуем в число
+    const date = document.getElementById('datePicker').value;
+    const timeSlot = document.getElementById('timeSlot').value;
 
-            const token = localStorage.getItem('token');
-            const response = await fetch('/api/bookings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ place_id: placeId, time_slot: timeSlot })
-            });
+    if (!date || !timeSlot) {
+        alert("Please select a date and time");
+        return;
+    }
 
-            if (response.ok) {
-                alert("Booking added successfully!");
-                loadBookings(placeId);
-            } else {
-                alert("Failed to add booking");
-            }
-        }
+    const token = localStorage.getItem('token');
+
+    const requestData = {
+        place_id: placeId,
+        date: date,       // Отправляем дату
+        time_slot: timeSlot
+    };
+
+    console.log("Sending request:", requestData);
+
+    const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestData)
+    });
+
+    const responseText = await response.text();
+    console.log("Response:", response.status, responseText);
+
+    if (response.ok) {
+        alert("Booking added successfully!");
+        loadBookings(placeId);
+    } else {
+        alert(`Failed to add booking: ${response.status} - ${responseText}`);
+    }
+}
 
         async function deleteBooking(bookingId, placeId) {
             const token = localStorage.getItem('token');
