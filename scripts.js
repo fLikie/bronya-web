@@ -276,6 +276,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const placeId = urlParams.get('id');
+    const bookingsBtn = document.getElementById("viewBookingsBtn");
+    if (bookingsBtn && placeId) {
+        bookingsBtn.href = `bookings.html?id=${placeId}`;
+    }
+
     if (document.getElementById("placesTable")) {
         loadPlaces(); // Запуск только на places.html
     }
