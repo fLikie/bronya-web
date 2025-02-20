@@ -264,7 +264,7 @@ function formatPhoneNumber(event) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    if (window.location.pathname.includes("login.html")) {
+    if (window.location.pathname.includes("index.html")) {
         const phoneInput = document.getElementById("phoneNumber");
         if (phoneInput) {
             phoneInput.addEventListener("input", formatPhoneNumber);
