@@ -104,7 +104,7 @@ async function loadPlace() {
         document.getElementById('placeName').value = place.Name;
         document.getElementById('placeLocation').value = place.Location;
         const currentImage = document.getElementById('currentImage');
-        currentImage.src = `/uploads/${place.Image}`;
+        currentImage.src = `/uploads/${place.image}`;
         currentImage.style.display = 'block';
     } else {
         alert("Failed to load place");
