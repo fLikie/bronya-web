@@ -35,28 +35,6 @@
     </div>
     <script src="scripts.js"></script>
     <script>
-        async function loadPlace() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const placeId = urlParams.get('id');
-            if (!placeId) {
-                alert("Invalid place ID");
-                window.location.href = "places.html";
-                return;
-            }
-
-            const response = await fetch(`/api/places/${placeId}`);
-            if (response.ok) {
-                const place = await response.json();
-                document.getElementById('placeTitle').textContent = place.Name;
-                document.getElementById('placeLocation').textContent = place.Location;
-                document.getElementById('placeImage').src = `/uploads/${place.Image}`;
-                loadBookings(placeId);
-            } else {
-                alert("Failed to load place");
-                window.location.href = "places.html";
-            }
-        }
-
         async function loadBookings(placeId) {
             const response = await fetch(`/api/places/${placeId}/bookings`);
             if (response.ok) {
