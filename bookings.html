@@ -111,7 +111,7 @@ async function loadBookings(placeId) {
 
         async function addBooking() {
             const urlParams = new URLSearchParams(window.location.search);
-            const placeId = urlParams.get('id');
+            const placeId = Number(urlParams.get('id'));
             const timeSlot = document.getElementById('timeSlot').value;
             if (!timeSlot) {
                 alert("Please select a time");
