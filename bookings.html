@@ -35,42 +35,79 @@
     </div>
     <script src="scripts.js"></script>
     <script>
-                async function loadBookingsPage() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const placeId = urlParams.get('id');
-            if (!placeId) {
-                alert("Invalid place ID");
-                window.location.href = "places.html";
-                return;
-            }
+async function loadBookingsPage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const placeId = urlParams.get('id');
 
-            const response = await fetch(`/api/places/${placeId}`);
-            if (response.ok) {
-                const place = await response.json();
-                document.getElementById('placeTitle').textContent = `Bookings for ${place.Name}`;
-                document.getElementById('placeLocation').textContent = place.Location;
-                loadBookings(placeId);
-            } else {
-                alert("Failed to load place");
-                window.location.href = "places.html";
-            }
-        }
+    if (!placeId) {
+        alert("Invalid place ID");
+        window.location.href = "places.html";
+        return;
+    }
 
-        async function loadBookings(placeId) {
-            const response = await fetch(`/api/places/${placeId}/bookings`);
-            if (response.ok) {
-                const bookings = await response.json();
-                const table = document.getElementById('bookingsTable');
-                table.innerHTML = '';
-                bookings.forEach(booking => {
-                    table.innerHTML += `<tr>
-                        <td>${booking.time_slot}</td>
-                        <td>${booking.user_id}</td>
-                        <td><button onclick="deleteBooking(${booking.id}, ${placeId})">Delete</button></td>
-                    </tr>`;
-                });
-            }
+    console.log("Place ID:", placeId); // Проверяем, какой ID передаётся
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert("Unauthorized. Please log in.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const response = await fetch(`/api/places/${placeId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
         }
+    });
+
+    if (response.ok) {
+        const place = await response.json();
+        document.getElementById('placeTitle').textContent = `Bookings for ${place.Name}`;
+        document.getElementById('placeLocation').textContent = place.Location;
+        loadBookings(placeId);
+    } else if (response.status === 401) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem('token');
+        window.location.href = "login.html";
+    } else {
+        alert("Failed to load place");
+        console.error("Error fetching place:", response.status, await response.text());
+        window.location.href = "places.html";
+    }
+}
+
+
+async function loadBookings(placeId) {
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(`/api/places/${placeId}/bookings`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (response.ok) {
+        const bookings = await response.json();
+        const table = document.getElementById('bookingsTable');
+        table.innerHTML = '';
+        bookings.forEach(booking => {
+            table.innerHTML += `<tr>
+                <td>${booking.time_slot}</td>
+                <td>${booking.user_id}</td>
+                <td><button onclick="deleteBooking(${booking.id}, ${placeId})">Delete</button></td>
+            </tr>`;
+        });
+    } else if (response.status === 401) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem('token');
+        window.location.href = "login.html";
+    } else {
+        alert("Failed to load bookings");
+        console.error("Error fetching bookings:", response.status, await response.text());
+    }
+}
 
         async function addBooking() {
             const urlParams = new URLSearchParams(window.location.search);
